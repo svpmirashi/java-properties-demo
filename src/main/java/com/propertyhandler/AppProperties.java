@@ -1,4 +1,4 @@
-package com.wkfsfrc.fscframework.common;
+package com.propertyhandler;
 
 /*
  * @Author: Shrikrishna Prabhumirashi
@@ -18,13 +18,13 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public final class FsFrameworkProperties {
+public final class AppProperties {
 	private static final String PROPERTIES_FILE_LOCATION = "user.home";
-	private static final String PROPERTIES_FILE_NAME = "fsframework.properties";
+	private static final String PROPERTIES_FILE_NAME = "common.properties";
     
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
     
-	private static final Logger LOGGER = Logger.getLogger(FsFrameworkProperties.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(AppProperties.class.getName());
     
     public static final void setProperty(String name, String value) {
 
@@ -76,30 +76,37 @@ public final class FsFrameworkProperties {
         saveProperties(properties);
     }
 
+    private static String getPropertyFilePath() {
+    	return System.getProperty(PROPERTIES_FILE_LOCATION) + File.separator + PROPERTIES_FILE_NAME;
+    }
+    
+    private static boolean propertyFileExists() {
+    	return new File(getPropertyFilePath()).exists();
+    }
+    
     /**
      * @return
      */
     private static Properties loadProperties() {
 
         Properties properties = new Properties();
-
-        try (FileReader reader = new FileReader(System.getProperty(PROPERTIES_FILE_LOCATION) + File.separator + PROPERTIES_FILE_NAME)) {
+        
+        if(!propertyFileExists()) {
+        	return properties;
+        }
+        
+        try (FileReader reader = new FileReader(getPropertyFilePath())) {
 
             properties.load(reader);
 
             return properties;
 
-        } catch (FileNotFoundException e) {
-
-            LOGGER.log(Level.INFO, e.getMessage(), e);
-
-            return properties;
-
         } catch (IOException e) {
 
-            throw new FsFrameworkException(e.getMessage(), e);
+            throw new AppPropertiesException(e.getMessage(), e);
         }
     }
+
 
     /**
      * @param properties
@@ -112,7 +119,7 @@ public final class FsFrameworkProperties {
 
         } catch (IOException e) {
 
-            throw new FsFrameworkException(e.getMessage(), e);
+            throw new AppPropertiesException(e.getMessage(), e);
         }
     }
 
